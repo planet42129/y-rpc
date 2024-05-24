@@ -70,8 +70,6 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
             }
             //做出响应：序列化rpcResponse
             doResponse(request, rpcResponse, serializer);
-
-
         });
     }
 

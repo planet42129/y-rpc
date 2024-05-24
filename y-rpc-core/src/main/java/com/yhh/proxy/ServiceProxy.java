@@ -1,42 +1,109 @@
 package com.yhh.proxy;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
+import cn.hutool.core.collection.CollUtil;
+import com.yhh.RpcApplication;
+import com.yhh.config.RpcConfig;
+import com.yhh.constant.RpcConstant;
 import com.yhh.model.RpcRequest;
 import com.yhh.model.RpcResponse;
-import com.yhh.serializer.JdkSerializer;
-import com.yhh.serializer.Serializer;
+import com.yhh.model.ServiceMetaInfo;
+import com.yhh.registry.Registry;
+import com.yhh.registry.RegistryFactory;
+import com.yhh.server.tcp.VertxTcpClient;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * 服务代理（JDK动态代理）
+ * 替服务消费者构造rpcRequest对象、序列化rpcRequest对象、发送请求、
+ * 反序列化响应、得到rpcResponse对象，获取方法调用的结果
  *
  * @author hyh
  * @date 2024/5/11
  */
+@Slf4j
 public class ServiceProxy implements InvocationHandler {
+
+    /**
+     * 基于TCP网络传输的动态代理
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        //创建序列化器
-        Serializer serializer = new JdkSerializer();
+        String serviceName = method.getDeclaringClass().getName();
+
         //创建rpcRequest对象
         RpcRequest rpcRequest = RpcRequest.builder()
-                .serviceName(method.getDeclaringClass().getName())
+                .serviceName(serviceName)
+                .methodName(method.getName())
+                .parameterTypes(method.getParameterTypes())
+                .args(args)
+                .build();
+
+        //发请求
+        //从注册中心获取服务提供者请求地址
+        RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+        Registry registry = RegistryFactory.getInstance(rpcConfig.getRegistryConfig().getRegistry());
+        ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
+        serviceMetaInfo.setServiceName(serviceName);
+        serviceMetaInfo.setServiceVersion(RpcConstant.DEFAULT_SERVICE_VERSION);
+        List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
+        if (CollUtil.isEmpty(serviceMetaInfoList)) {
+            //todo 换成自定义异常
+            throw new RuntimeException("no service_address");
+        }
+        // todo 改成可以轮询的地址？
+        ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
+
+        //发送TCP请求
+        RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);
+        return rpcResponse.getData();
+    }
+
+
+    /**
+     * 基于Http网络传输的动态代理
+     */
+/*    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        String serviceName = method.getDeclaringClass().getName();
+
+        //创建rpcRequest对象
+        RpcRequest rpcRequest = RpcRequest.builder()
+                .serviceName(serviceName)
                 .methodName(method.getName())
                 .parameterTypes(method.getParameterTypes())
                 .args(args)
                 .build();
         //发请求
         try {
+            //创建序列化器
+            Serializer serializer =
+                    SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
+
             //将rpc请求对象序列化，方便进行网络传输
             byte[] bodyBytes = serializer.serialize(rpcRequest);
             byte[] result;
+
+            //从注册中心获取服务提供者请求地址
+            RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+            Registry registry = RegistryFactory.getInstance(rpcConfig.getRegistryConfig().getRegistry());
+            ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
+            serviceMetaInfo.setServiceName(serviceName);
+            serviceMetaInfo.setServiceVersion(RpcConstant.DEFAULT_SERVICE_VERSION);
+            List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
+            if (CollUtil.isEmpty(serviceMetaInfoList)) {
+                //todo 换成自定义异常
+                throw new RuntimeException("no service_address");
+            }
+            // todo 改成可以轮询的地址？
+            ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
+
             //使用hutool工具构造http请求，获得http响应
             //todo 这里的请求地址被硬编码了，需要使用注册中心和服务发现机制解决
-            try (HttpResponse httpResponse = HttpRequest.post("http://localhost:8080")
+            try (HttpResponse httpResponse = HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
                     .body(bodyBytes)
                     .execute()) {
                 result = httpResponse.bodyBytes();
@@ -48,5 +115,5 @@ public class ServiceProxy implements InvocationHandler {
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 }

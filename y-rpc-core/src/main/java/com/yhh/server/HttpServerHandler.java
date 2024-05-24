@@ -1,14 +1,16 @@
 package com.yhh.server;
 
+import com.yhh.RpcApplication;
 import com.yhh.model.RpcRequest;
 import com.yhh.model.RpcResponse;
 import com.yhh.registry.LocalRegistry;
-import com.yhh.serializer.JdkSerializer;
 import com.yhh.serializer.Serializer;
+import com.yhh.serializer.SerializerFactory;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -23,15 +25,17 @@ import java.lang.reflect.Method;
  * @author hyh
  * @date 2024/5/11
  */
+@Slf4j
 public class HttpServerHandler implements Handler<HttpServerRequest> {
 
 
     @Override
     public void handle(HttpServerRequest request) {
         //指定序列化器
-        final Serializer serializer = new JdkSerializer();
+        final Serializer serializer =
+                SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
         //记录日志
-        System.out.println("Received request: " + request.method() + " " + request.uri());
+        log.info("Received request: " + request.method() + " " + request.uri());
 
         request.bodyHandler(body -> {
             byte[] bytes = body.getBytes();
@@ -49,14 +53,14 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
                 doResponse(request, rpcResponse, serializer);
                 return;
             }
-            //否则继续解析rpcRequset
+            //否则继续解析rpcRequest
 
             try {
                 //通过Java反射机制调用服务实现类的方法，并得到调用结果
                 Class<?> implClass = LocalRegistry.get(rpcRequest.getServiceName());
                 Constructor<?> constructor = implClass.getConstructor();
                 Method method = implClass.getMethod(rpcRequest.getMethodName(), rpcRequest.getParameterTypes());
-                //todo bug: 直接通过implClass.newInstance()方法获取实现类的实例对象，debug的时候报错implClass为null
+                //bug: 直接通过implClass.newInstance()方法获取实现类的实例对象，debug的时候报错implClass为null
                 // 解决：先通过Class实例获取构造器对象，再通过构造器对象创建实例constructor.newInstance()
                 Object invokeResult = method.invoke(constructor.newInstance(), rpcRequest.getArgs());
                 //封装返回结果rpcResponse

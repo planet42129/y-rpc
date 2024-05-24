@@ -1,6 +1,8 @@
 
-X	java:S125"<This block of commented-out lines of code should be removed.(œú«¬8Õ³©½ö1
+X	java:S125"<This block of commented-out lines of code should be removed.(œú«¬8÷¯¢Ú÷1
 O
-java:S1135"2Complete the task associated to this TODO comment.(ò®À¬8Õ³©½ö1
-L	java:S106"+Replace this use of System.out by a logger.(õÃß×ıÿÿÿÿ8×³©½ö1
-G	java:S106"+Replace this use of System.out by a logger.(“ş¶÷8×³©½ö1
+java:S1135"2Complete the task associated to this TODO comment.(ò®À¬8·¡Ì‘÷1
+L	java:S106"+Replace this use of System.out by a logger.(õÃß×ıÿÿÿÿ8Æ¡Ì‘÷1
+G	java:S106"+Replace this use of System.out by a logger.(“ş¶÷8Æ¡Ì‘÷1
+g
+java:S1128"JRemove this unused import 'com.yhh.consumer.proxy.UserServiceStaticProxy'.(•¡Ä®8÷¯¢Ú÷1

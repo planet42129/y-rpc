@@ -2,6 +2,7 @@ package com.yhh.consumer;
 
 import com.yhh.common.model.User;
 import com.yhh.common.service.UserService;
+import com.yhh.consumer.proxy.UserServiceStaticProxy;
 import com.yhh.proxy.ServiceProxyFactory;
 
 

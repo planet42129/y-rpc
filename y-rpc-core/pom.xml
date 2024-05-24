@@ -47,6 +47,34 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        <!-- 序列化 -->
+        <!-- https://mvnrepository.com/artifact/com.caucho/hessian -->
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>4.0.66</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.esotericsoftware/kryo -->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>5.6.0</version>
+        </dependency>
+
+<!--        序列化器的数据处理-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.1</version>
+        </dependency>
+
+        <!-- etcd注册中心 -->
+        <!-- https://mvnrepository.com/artifact/io.etcd/jetcd-core -->
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-core</artifactId>
+            <version>0.7.7</version>
+        </dependency>
 
     </dependencies>
 
