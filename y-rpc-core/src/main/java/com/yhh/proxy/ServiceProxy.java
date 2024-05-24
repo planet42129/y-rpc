@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import com.yhh.RpcApplication;
 import com.yhh.config.RpcConfig;
 import com.yhh.constant.RpcConstant;
+import com.yhh.loadbalancer.LoadBalancer;
+import com.yhh.loadbalancer.LoadBalancerFactory;
 import com.yhh.model.RpcRequest;
 import com.yhh.model.RpcResponse;
 import com.yhh.model.ServiceMetaInfo;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -54,10 +57,16 @@ public class ServiceProxy implements InvocationHandler {
             //todo 换成自定义异常
             throw new RuntimeException("no service_address");
         }
-        // todo 改成可以轮询的地址？
-        ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
+        //调用负载均衡器获取服务实现类节点
 
-        //发送TCP请求
+        //获取负载均衡器
+        LoadBalancer loadBalancer = LoadBalancerFactory.getInstance(rpcConfig.getLoadBalancer());
+        //将调用的方法名称（请求路径）作为负载均衡参数
+        HashMap<String, Object> requestParams = new HashMap<>();
+        requestParams.put("methodName", rpcRequest.getMethodName());
+        ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
+
+        //发送rpc请求
         RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);
         return rpcResponse.getData();
     }
