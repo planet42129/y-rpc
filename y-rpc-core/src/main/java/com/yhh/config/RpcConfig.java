@@ -1,5 +1,7 @@
 package com.yhh.config;
 
+import com.yhh.fault.retry.RetryStrategyKeys;
+import com.yhh.fault.tolerant.TolerantStrategyKeys;
 import com.yhh.loadbalancer.LoadBalancer;
 import com.yhh.loadbalancer.LoadBalancerKeys;
 import com.yhh.serializer.Serializer;
@@ -55,5 +57,16 @@ public class RpcConfig {
      * 负载均衡器
      */
     private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN;
+
+    /**
+     * 重试策略
+     *
+     */
+    private String retryStrategy = RetryStrategyKeys.NO;
+
+    /**
+     * 容错策略
+     */
+    private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
 
 }

@@ -1,10 +1,12 @@
 package com.yhh.provider;
 
 import com.yhh.RpcApplication;
+import com.yhh.bootstrap.ProviderBootstrap;
 import com.yhh.common.service.UserService;
 import com.yhh.config.RegistryConfig;
 import com.yhh.config.RpcConfig;
 import com.yhh.model.ServiceMetaInfo;
+import com.yhh.model.ServiceRegisterInfo;
 import com.yhh.registry.LocalRegistry;
 import com.yhh.registry.Registry;
 import com.yhh.registry.RegistryFactory;
@@ -12,13 +14,26 @@ import com.yhh.server.HttpServer;
 import com.yhh.server.VertxHttpServer;
 import com.yhh.server.tcp.VertxTcpServer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author hyh
  * @date 2024/5/13
  */
 public class ProviderExample {
     public static void main(String[] args) {
-        //RPC框架初始化
+        //要注册的服务
+        List<ServiceRegisterInfo> serviceRegisterInfoList = new ArrayList<>();
+        ServiceRegisterInfo serviceRegisterInfo = new ServiceRegisterInfo<>(UserService.class.getName(), UserServiceImpl.class);
+        serviceRegisterInfoList.add(serviceRegisterInfo);
+
+        ProviderBootstrap.init(serviceRegisterInfoList);
+
+
+
+
+/*        //RPC框架初始化
         RpcApplication.init();
         //注册服务
         String serviceName = UserService.class.getName();
@@ -39,12 +54,12 @@ public class ProviderExample {
         }
 
 
-/*        //启动web服务
+*//*        //启动web服务
         HttpServer httpServer = new VertxHttpServer();
-        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());*/
+        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());*//*
         //启动TCP服务器
         VertxTcpServer vertxTcpServer = new VertxTcpServer();
-        vertxTcpServer.doStart(8080);
+        vertxTcpServer.doStart(8080);*/
 
     }
 }

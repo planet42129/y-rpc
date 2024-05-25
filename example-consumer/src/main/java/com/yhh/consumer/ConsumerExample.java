@@ -1,5 +1,6 @@
 package com.yhh.consumer;
 
+import com.yhh.bootstrap.ConsumerBootstrap;
 import com.yhh.common.model.User;
 import com.yhh.common.service.UserService;
 import com.yhh.proxy.ServiceProxyFactory;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConsumerExample {
     public static void main(String[] args) {
+        ConsumerBootstrap.init();
 
         UserService userService = ServiceProxyFactory.getProxy(UserService.class);
         User user = new User();

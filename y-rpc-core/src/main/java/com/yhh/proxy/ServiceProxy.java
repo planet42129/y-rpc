@@ -4,6 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import com.yhh.RpcApplication;
 import com.yhh.config.RpcConfig;
 import com.yhh.constant.RpcConstant;
+import com.yhh.fault.retry.RetryStrategy;
+import com.yhh.fault.retry.RetryStrategyFactory;
+import com.yhh.fault.tolerant.TolerantStrategy;
+import com.yhh.fault.tolerant.TolerantStrategyFactory;
 import com.yhh.loadbalancer.LoadBalancer;
 import com.yhh.loadbalancer.LoadBalancerFactory;
 import com.yhh.model.RpcRequest;
@@ -66,8 +70,18 @@ public class ServiceProxy implements InvocationHandler {
         requestParams.put("methodName", rpcRequest.getMethodName());
         ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
 
-        //发送rpc请求
-        RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);
+        //使用重试机制 发送rpc请求
+        RpcResponse rpcResponse;
+        try{
+            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+            rpcResponse = retryStrategy.doRetry(()->
+                    VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo)
+            );
+        } catch (Exception e) {
+            //容错机制
+            TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(rpcConfig.getTolerantStrategy());
+            rpcResponse = tolerantStrategy.doTolerant(null, e);
+        }
         return rpcResponse.getData();
     }
 

@@ -1,0 +1,2 @@
+no=com.yhh.fault.retry.NoRetryStrategy
+fixedInterval=com.yhh.fault.retry.FixedIntervalRetryStrategy

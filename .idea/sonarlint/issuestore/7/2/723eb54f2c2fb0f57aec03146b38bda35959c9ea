@@ -1,0 +1,21 @@
+
+c	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(­Ô„¢8œÜÇÎú1
+h	java:S112§"FDefine and throw a dedicated exception instead of using a generic one.(‡õ½íùÿÿÿÿ8œÜÇÎú1
+h	java:S112Î"FDefine and throw a dedicated exception instead of using a generic one.(§ÿ€âúÿÿÿÿ8œÜÇÎú1
+K
+java:S1604”"(Make this anonymous inner class a lambda(œ¥Ô½ùÿÿÿÿ8œÜÇÎú1
+]
+java:S1075%"ARefactor your code to get this URI from a customizable parameter.(ö“ìk8¼ÜÇÎú1
+|
+java:S2142Œ"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(”ı¾8¼ÜÇÎú1
+|
+java:S2142¦"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(”ı¾8ÆÜÇÎú1
+U
+java:S1135½"2Complete the task associated to this TODO comment.(ûØ¹ßşÿÿÿÿ8ÌÜÇÎú1
+M	java:S106É"+Replace this use of System.out by a logger.(õÉ¹ãıÿÿÿÿ8ÌÜÇÎú1
+|
+java:S2142Í"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(”ı¾8ÌÜÇÎú1
+Q
+java:S1128"4Remove this unused import 'io.vertx.core.json.Json'.(ÀªÏö8ÌÜÇÎú1
+a
+java:S1128"DRemove this unused import 'java.util.concurrent.ExecutionException'.(¡£ØÍ8ÌÜÇÎú1
